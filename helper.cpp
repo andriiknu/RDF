@@ -1,11 +1,11 @@
 #include "TH1D.h"
-
+#include <string>
 
 TH1D SliceHisto (TH1D h, int xfirst, int xlast)
 {
 
    // do slice in xfirst:xlast including xfirst and xlast                                                                           
-   TH1D res("res","slice of h",xlast-xfirst, h.GetXaxis()->GetBinLowEdge(xfirst), h.GetXaxis()->GetBinUpEdge(xlast-1));
+   TH1D res((std::string("h_sliced_")+h.GetTitle()).c_str(), h.GetTitle(),xlast-xfirst, h.GetXaxis()->GetBinLowEdge(xfirst), h.GetXaxis()->GetBinUpEdge(xlast-1));
    // note that histogram arrays are : [ undeflow, bin1, bin2,....., binN, overflow]                                                                             
    std::copy(h.GetArray()+xfirst,h.GetArray()+xlast,res.GetArray()+1);
    // set correct underflow/overflows
