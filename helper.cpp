@@ -1,5 +1,7 @@
 #include "TH1D.h"
 #include <string>
+#include "TRandom2.h"
+#include "ROOT/RVec.hxx"
 
 TH1D SliceHisto (TH1D h, int xfirst, int xlast)
 {
@@ -22,4 +24,13 @@ TH1D Slice(TH1D h, double low_edge, double high_edge)
     int xlast = h.FindBin(high_edge);
     return SliceHisto(h, xfirst, xlast);
 }
+
+ROOT::VecOps::RVec<float> pt_res_up(ROOT::VecOps::RVec<float>& jet_pt)
+{
+    ROOT::VecOps::RVec<float> res(jet_pt.size());
+    TRandom2 rnmd;
+    for (auto& e: res) e = rnmd.Gaus(1,0.05);
+    return res;
+}
+
 
