@@ -3,6 +3,7 @@
 #include "TRandom2.h"
 #include "ROOT/RVec.hxx"
 
+
 TH1D SliceHisto (TH1D h, int xfirst, int xlast)
 {
 
@@ -31,6 +32,23 @@ ROOT::VecOps::RVec<float> pt_res_up(ROOT::VecOps::RVec<float>& jet_pt)
     TRandom2 rnmd;
     for (auto& e: res) e = rnmd.Gaus(1,0.05);
     return res;
+}
+
+float pt_nominal(){
+    return 1.;
+}
+
+float pt_scale_up(){
+    return 1.03;
+}
+ROOT::VecOps::RVec<float> btag_weight_variation (const int& i_jet, const ROOT::VecOps::RVec<float>& jet_pt) {
+   return 1 + ROOT::VecOps::RVec<float>({.075, -.075}) * (jet_pt[i_jet]/50);
+}
+
+
+
+ROOT::VecOps::RVec<float> flat_variation(){
+    return 1 + ROOT::VecOps::RVec<float>({.025, -.025});
 }
 
 
