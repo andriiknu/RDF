@@ -4,6 +4,8 @@ import json
 
 def get_values(h):
     return np.array([h.GetBinContent(i+1) for i in range (h.GetNbinsX())])
+def get_variances(h):
+    return np.array([h.GetBinError(i+1) for i in range (h.GetNbinsX())])
 
 def match_histos (rdf_hist, coffea_hist, precision):
     rdf_values = get_values(rdf_hist)
@@ -13,7 +15,7 @@ def match_histos (rdf_hist, coffea_hist, precision):
     mask = rdf_values == coffea_values
     return not (False in mask)
 
-def deviations(rdf_hist, coffea_hist):
+def get_deviations(rdf_hist, coffea_hist):
     rdf_values = get_values(rdf_hist)
     coffea_values = get_values(coffea_hist)
     deviations = np.zeros(len(rdf_values))
@@ -26,7 +28,7 @@ def deviations(rdf_hist, coffea_hist):
     return deviations
 
 
-def get_deviations (rdf, coffea):
+def get_mismatched (rdf, coffea):
     mismatched = []
     rdf = ROOT.TFile.Open(rdf)
     coffea = ROOT.TFile.Open(coffea)
@@ -39,15 +41,17 @@ def get_deviations (rdf, coffea):
                 rdf_hist = rdf.Get(hist_name)
                 coffea_hist = coffea.Get(hist_name)
                 if (rdf_hist and coffea_hist):
-                    deviation = np.max(deviations(rdf_hist, coffea_hist))
+                    deviations = get_deviations(rdf_hist, coffea_hist)
+                    i = np.argmax(deviations); dev = deviations[i]
+                    variance = coffea_hist.GetBinError(int(i+1))
 #                     if deviation > 20:
-                    if deviation > 0.0001 and "res_up" not in hist_name:
-                    # if "res_up" in hist_name:
-                        print(f"{hist_name} maximum deviation: {deviation} %")
+                    # if deviation > 0.0001 and "res_up" not in hist_name:
+                    if "res_up" in hist_name:
+                        print(f"deviation={dev:.2f}% variance/deviation={100*variance/dev:.2f}%\t-\t{hist_name}")
                         mismatched.append(hist_name)
                 else:
                     raise ValueError('rdf_hist and coffea_hist is Zombie')
     return mismatched
 
 if __name__ == "__main__":
-    get_deviations("rdf.root", "histograms_local.root")
+    get_mismatched("rdf.root", "histograms_local.root")
