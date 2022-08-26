@@ -45,11 +45,13 @@ def get_mismatched (rdf, coffea):
                     i = np.argmax(deviations); dev = deviations[i]
                     variance = coffea_hist.GetBinError(int(i+1))
 #                     if deviation > 20:
-                    # if deviation > 0.0001 and "res_up" not in hist_name:
-                    if "res_up" in hist_name:
-                        print(f"deviation={dev:.2f}% variance/deviation={100*variance/dev:.2f}%\t-\t{hist_name}")
-                        mismatched.append(hist_name)
+                    if dev > 0.0001 and "res_up" not in hist_name:
+                        print(f"deviation={dev:.2f}%\t-\t{hist_name}")
+#                     if "res_up" in hist_name:
+#                         print(f"deviation={dev:.2f}% variance/deviation={100*variance/dev:.2f}%\t-\t{hist_name}")
+#                         mismatched.append(hist_name)
                 else:
+                    print(hist_name)
                     raise ValueError('rdf_hist and coffea_hist is Zombie')
     return mismatched
 

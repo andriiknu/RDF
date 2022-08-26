@@ -26,7 +26,7 @@ TH1D Slice(TH1D h, double low_edge, double high_edge)
     return SliceHisto(h, xfirst, xlast);
 }
 
-ROOT::VecOps::RVec<float> pt_res_up(ROOT::VecOps::RVec<float>& jet_pt)
+ROOT::VecOps::RVec<float> pt_res_up(const ROOT::VecOps::RVec<float>& jet_pt)
 {
     ROOT::VecOps::RVec<float> res(jet_pt.size());
     TRandom2 rnmd;
@@ -34,19 +34,16 @@ ROOT::VecOps::RVec<float> pt_res_up(ROOT::VecOps::RVec<float>& jet_pt)
     return res;
 }
 
-float pt_nominal(){
-    return 1.;
-}
-
 float pt_scale_up(){
     return 1.03;
 }
+
+
 ROOT::VecOps::RVec<float> btag_weight_variation (const ROOT::VecOps::RVec<float>& jet_pt) {
    ROOT::VecOps::RVec<float> res;
    for (const float& pt: ROOT::VecOps::Take(jet_pt,4)) {
-       res.push_back(.075*pt/50); res.push_back(-.075*pt/50);
+       res.push_back(1+.075*pt/50); res.push_back(1-.075*pt/50);
    }
-//    std::cout<<(res.size()>>std::endl;
    return res;
 }
 
