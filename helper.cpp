@@ -41,8 +41,13 @@ float pt_nominal(){
 float pt_scale_up(){
     return 1.03;
 }
-ROOT::VecOps::RVec<float> btag_weight_variation (const int& i_jet, const ROOT::VecOps::RVec<float>& jet_pt) {
-   return 1 + ROOT::VecOps::RVec<float>({.075, -.075}) * (jet_pt[i_jet]/50);
+ROOT::VecOps::RVec<float> btag_weight_variation (const ROOT::VecOps::RVec<float>& jet_pt) {
+   ROOT::VecOps::RVec<float> res;
+   for (const float& pt: ROOT::VecOps::Take(jet_pt,4)) {
+       res.push_back(.075*pt/50); res.push_back(-.075*pt/50);
+   }
+//    std::cout<<(res.size()>>std::endl;
+   return res;
 }
 
 
