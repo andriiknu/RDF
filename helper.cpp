@@ -30,7 +30,7 @@ ROOT::VecOps::RVec<float> pt_res_up(const ROOT::VecOps::RVec<float>& jet_pt)
 {
     ROOT::VecOps::RVec<float> res(jet_pt.size());
     TRandom2 rnmd;
-    for (auto& e: res) e = rnmd.Gaus(1,0.05);
+    for (auto& e: res) {rnmd.SetSeed(0); e = rnmd.Gaus(1,0.05);}
     return res;
 }
 
