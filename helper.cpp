@@ -3,7 +3,9 @@
 #include "TRandom2.h"
 #include "ROOT/RVec.hxx"
 
+// functions slicing histograms
 
+// accept numbers of bins as parameters
 TH1D SliceHisto (TH1D h, int xfirst, int xlast)
 {
 
@@ -19,6 +21,7 @@ TH1D SliceHisto (TH1D h, int xfirst, int xlast)
     return res;
 }
 
+// accept axis limits as parameters
 TH1D Slice(TH1D h, double low_edge, double high_edge)
 {
     int xfirst = h.FindBin(low_edge);
@@ -26,8 +29,11 @@ TH1D Slice(TH1D h, double low_edge, double high_edge)
     return SliceHisto(h, xfirst, xlast);
 }
 
+
+// functions creating systematic variations
 ROOT::VecOps::RVec<float> pt_res_up(const ROOT::VecOps::RVec<float>& jet_pt)
 {
+    // normal distribution with 5% variations, shape matches jets
     ROOT::VecOps::RVec<float> res(jet_pt.size());
     TRandom2 rnmd;
     for (auto& e: res) {rnmd.SetSeed(0); e = rnmd.Gaus(1,0.05);}
@@ -40,6 +46,7 @@ float pt_scale_up(){
 
 
 ROOT::VecOps::RVec<float> btag_weight_variation (const ROOT::VecOps::RVec<float>& jet_pt) {
+// weight variation depending on i-th jet pT (7.5% as default value, multiplied by i-th jet pT / 50 GeV)
    ROOT::VecOps::RVec<float> res;
    for (const float& pt: ROOT::VecOps::Take(jet_pt,4)) {
        res.push_back(1+.075*pt/50); res.push_back(1-.075*pt/50);
@@ -50,6 +57,7 @@ ROOT::VecOps::RVec<float> btag_weight_variation (const ROOT::VecOps::RVec<float>
 
 
 ROOT::VecOps::RVec<float> flat_variation(){
+    // 2.5% weight variations
     return 1 + ROOT::VecOps::RVec<float>({.025, -.025});
 }
 
