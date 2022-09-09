@@ -51,7 +51,7 @@ def set_style():
     plt.rcParams['text.color'] = "222222"
 
 
-def construct_fileset(n_files_max_per_sample, use_xcache=False, use_local=False):
+def construct_fileset(disk, n_files_max_per_sample, use_xcache=False, use_local=False):
     # using https://atlas-groupdata.web.cern.ch/atlas-groupdata/dev/AnalysisTop/TopDataPreparation/XSection-MC15-13TeV.data
     # for reference
     # x-secs are in pb
@@ -79,7 +79,7 @@ def construct_fileset(n_files_max_per_sample, use_xcache=False, use_local=False)
             if n_files_max_per_sample != -1:
                 file_list = file_list[:n_files_max_per_sample]  # use partial set of samples
 
-            file_paths = [f["path"] for f in file_list] if not use_local else [f"input/{process}_{variation}/{i}.root" for i in range(len(file_list))]
+            file_paths = [f["path"] for f in file_list] if not use_local else [f"{disk}/{process}_{variation}/{i}.root" for i in range(len(file_list))]
             if use_xcache:
                 file_paths = [f.replace("https://xrootd-local.unl.edu:1094", "root://red-xcache1.unl.edu") for f in file_paths]
             nevts_total = sum([f["nevts"] for f in file_list])
