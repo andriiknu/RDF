@@ -1,6 +1,6 @@
 #include "TH1D.h"
 #include <string>
-#include "TRandom2.h"
+#include "TRandom3.h"
 #include "ROOT/RVec.hxx"
 
 // functions slicing histograms
@@ -29,25 +29,25 @@ TH1D Slice(TH1D h, double low_edge, double high_edge)
     return SliceHisto(h, xfirst, xlast);
 }
 
-
 // functions creating systematic variations
-ROOT::VecOps::RVec<float> pt_res_up(const ROOT::VecOps::RVec<float>& jet_pt)
-{
+struct PtResUp {
+   std::vector<TRandom> fRandom;
+   PtResUp(unsigned nSlots) : fRandom(nSlots) {}
+
+   ROOT::VecOps::RVec<float> operator()(const ROOT::VecOps::RVec<float>& jet_pt, unsigned int slot)
+   {
     // normal distribution with 5% variations, shape matches jets
     ROOT::VecOps::RVec<float> res(jet_pt.size());
-//     TRandom2 rnmd;
     for (auto& e: res) {
-//         rnmd.SetSeed(0); 
-//         e = rnmd.Gaus(1,0.05);
-        e = gRandom->Gaus(1,0.05);
+        e = fRandom[slot].Gaus(1,0.05);
     }
     return res;
-}
+   }
+};
 
 float pt_scale_up(){
     return 1.03;
 }
-
 
 ROOT::VecOps::RVec<float> btag_weight_variation (const ROOT::VecOps::RVec<float>& jet_pt) {
 // weight variation depending on i-th jet pT (7.5% as default value, multiplied by i-th jet pT / 50 GeV)

@@ -40,7 +40,7 @@ ROOT.gSystem.CompileMacro("helper.cpp", "kO")
 
 N_FILES_MAX_PER_SAMPLE = args.nfiles or 1
 FILE = f'rdf{N_FILES_MAX_PER_SAMPLE}.root'
-START = 0 if not args.startwith else args.startwith
+START = args.startwith or 0
 
 print(f'you are processing {N_FILES_MAX_PER_SAMPLE} files starting from {START}')
 
@@ -84,6 +84,7 @@ class TtbarAnalysis(dict):
             "data": None
         }
         print(f'Total number of files: {self.total}')
+        ROOT.gInterpreter.Declare(f"auto pt_res_up_obj = PtResUp({ROOT.GetThreadPoolSize()});")
         
 
     def _construct_fileset(self):
@@ -137,7 +138,7 @@ class TtbarAnalysis(dict):
             # pt_res_up(jet_pt) - jet resolution systematic 
 
             
-            d = d.Vary('jet_pt', "ROOT::RVec<ROOT::RVecF>{jet_pt*pt_scale_up(), jet_pt*pt_res_up(jet_pt)}", ["pt_scale_up", "pt_res_up"])
+            d = d.Vary('jet_pt', "ROOT::RVec<ROOT::RVecF>{jet_pt*pt_scale_up(), jet_pt*pt_res_up_obj(jet_pt, rdfslot_)}", ["pt_scale_up", "pt_res_up"])
             if process == 'wjets':
                 
                 # flat weight variation definition
@@ -311,17 +312,17 @@ analysisManager['ttbar'].keys()
 
 
 
-output = ROOT.TFile.Open(FILE, 'RECREATE')
-for process in analysisManager:
-    for variation in analysisManager[process]:
-        for region in analysisManager[process][variation]:
-            hist_name = f"{region}_{process}_{variation}" if variation != 'nominal' else f"{region}_{process}"
-            hist = analysisManager[process][variation][region]
-            if not isinstance(hist, ROOT.TH1D): hist = hist.GetValue() #this this a bag
-            if hist.IsZombie(): raise TypeError(hist_name)
-            hist_sliced = ROOT.Slice(hist, 120, 550)
-            hist_binned = hist_sliced.Rebin(2, hist.GetTitle())
-            output.WriteObject(hist_binned, hist_name)
-output.Close()
+# output = ROOT.TFile.Open(f'histograms/{FILE}', 'RECREATE')
+# for process in analysisManager:
+#     for variation in analysisManager[process]:
+#         for region in analysisManager[process][variation]:
+#             hist_name = f"{region}_{process}_{variation}" if variation != 'nominal' else f"{region}_{process}"
+#             hist = analysisManager[process][variation][region]
+#             if not isinstance(hist, ROOT.TH1D): hist = hist.GetValue() #this this a bag
+#             if hist.IsZombie(): raise TypeError(hist_name)
+#             hist_sliced = ROOT.Slice(hist, 120, 550)
+#             hist_binned = hist_sliced.Rebin(2, hist.GetTitle())
+#             output.WriteObject(hist_binned, hist_name)
+# output.Close()
 
 
