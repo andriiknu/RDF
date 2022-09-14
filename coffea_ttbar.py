@@ -489,75 +489,75 @@ elif PIPELINE == "servicex_databinder":
 print(f"\nexecution took {time.time() - t0:.2f} seconds")
 
 
-# ### Inspecting the produced histograms
-# 
-# Let's have a look at the data we obtained.
-# We built histograms in two phase space regions, for multiple physics processes and systematic variations.
+# # ### Inspecting the produced histograms
+# # 
+# # Let's have a look at the data we obtained.
+# # We built histograms in two phase space regions, for multiple physics processes and systematic variations.
 
-# In[11]:
-
-
-utils.set_style()
-
-all_histograms[120j::hist.rebin(2), "4j1b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
-plt.legend(frameon=False)
-plt.title(">= 4 jets, 1 b-tag")
-plt.xlabel("HT [GeV]");
+# # In[11]:
 
 
-# In[12]:
+# utils.set_style()
+
+# all_histograms[120j::hist.rebin(2), "4j1b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1, edgecolor="grey")
+# plt.legend(frameon=False)
+# plt.title(">= 4 jets, 1 b-tag")
+# plt.xlabel("HT [GeV]");
 
 
-all_histograms[:, "4j2b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
-plt.legend(frameon=False)
-plt.title(">= 4 jets, >= 2 b-tags")
-plt.xlabel("$m_{bjj}$ [Gev]");
+# # In[12]:
 
 
-# Our top reconstruction approach ($bjj$ system with largest $p_T$) has worked!
-# 
-# Let's also have a look at some systematic variations:
-# - b-tagging, which we implemented as jet-kinematic dependent event weights,
-# - jet energy variations, which vary jet kinematics, resulting in acceptance effects and observable changes.
-# 
-# We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
-
-# In[13]:
+# all_histograms[:, "4j2b", :, "nominal"].stack("process")[::-1].plot(stack=True, histtype="fill", linewidth=1,edgecolor="grey")
+# plt.legend(frameon=False)
+# plt.title(">= 4 jets, >= 2 b-tags")
+# plt.xlabel("$m_{bjj}$ [Gev]");
 
 
-# b-tagging variations
-all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
-all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
-all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_1_up"].plot(label="NP 2", linewidth=2)
-all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_2_up"].plot(label="NP 3", linewidth=2)
-all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_3_up"].plot(label="NP 4", linewidth=2)
-plt.legend(frameon=False)
-plt.xlabel("HT [GeV]")
-plt.title("b-tagging variations");
+# # Our top reconstruction approach ($bjj$ system with largest $p_T$) has worked!
+# # 
+# # Let's also have a look at some systematic variations:
+# # - b-tagging, which we implemented as jet-kinematic dependent event weights,
+# # - jet energy variations, which vary jet kinematics, resulting in acceptance effects and observable changes.
+# # 
+# # We are making of [UHI](https://uhi.readthedocs.io/) here to re-bin.
+
+# # In[13]:
 
 
-# In[14]:
+# # b-tagging variations
+# all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
+# all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_0_up"].plot(label="NP 1", linewidth=2)
+# all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_1_up"].plot(label="NP 2", linewidth=2)
+# all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_2_up"].plot(label="NP 3", linewidth=2)
+# all_histograms[120j::hist.rebin(2), "4j1b", "ttbar", "btag_var_3_up"].plot(label="NP 4", linewidth=2)
+# plt.legend(frameon=False)
+# plt.xlabel("HT [GeV]")
+# plt.title("b-tagging variations");
 
 
-# jet energy scale variations
-all_histograms[:, "4j2b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
-all_histograms[:, "4j2b", "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
-all_histograms[:, "4j2b", "ttbar", "pt_res_up"].plot(label="resolution up", linewidth=2)
-plt.legend(frameon=False)
-plt.xlabel("$m_{bjj}$ [Gev]")
-plt.title("Jet energy variations");
+# # In[14]:
 
 
-# ### Save histograms to disk
-# 
-# We'll save everything to disk for subsequent usage.
-# This also builds pseudo-data by combining events from the various simulation setups we have processed.
+# # jet energy scale variations
+# all_histograms[:, "4j2b", "ttbar", "nominal"].plot(label="nominal", linewidth=2)
+# all_histograms[:, "4j2b", "ttbar", "pt_scale_up"].plot(label="scale up", linewidth=2)
+# all_histograms[:, "4j2b", "ttbar", "pt_res_up"].plot(label="resolution up", linewidth=2)
+# plt.legend(frameon=False)
+# plt.xlabel("$m_{bjj}$ [Gev]")
+# plt.title("Jet energy variations");
 
-# In[15]:
+
+# # ### Save histograms to disk
+# # 
+# # We'll save everything to disk for subsequent usage.
+# # This also builds pseudo-data by combining events from the various simulation setups we have processed.
+
+# # In[15]:
 
 
-filename = "histograms.root" if not INPUT_DATA_INSTALLATION else f"histograms{N_CORES}.root"
-utils.save_histograms(all_histograms, fileset, filename=filename)
+# filename = "histograms.root" if not INPUT_DATA_INSTALLATION else f"histograms{N_CORES}.root"
+# utils.save_histograms(all_histograms, fileset, filename=filename)
 
 
 # In[ ]:
