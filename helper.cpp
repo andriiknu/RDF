@@ -32,7 +32,7 @@ TH1D Slice(TH1D h, double low_edge, double high_edge)
 // functions creating systematic variations
 struct PtResUp {
    std::vector<TRandom> fRandom;
-   PtResUp(unsigned nSlots) : fRandom(nSlots) {for (int i = 0; i < nSlots; ++i) fRandom[i].SetSeed(gRandom->Integer(1000)}
+   PtResUp(unsigned nSlots) : fRandom(nSlots) {for (int i = 0; i < nSlots; ++i) fRandom[i].SetSeed(gRandom->Integer(1000));}
 
    ROOT::VecOps::RVec<float> operator()(const ROOT::VecOps::RVec<float>& jet_pt, unsigned int slot)
    {

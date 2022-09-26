@@ -12,7 +12,6 @@ parser = argparse.ArgumentParser()
 # Adding optional argument
 parser.add_argument("--ncores", type=int)
 parser.add_argument("--nfiles", type=int)
-parser.add_argument("--second_disk")
 parser.add_argument("--startwith", type=int, help='number of first file')
 
 # Read arguments from command line
@@ -39,7 +38,7 @@ ROOT.gSystem.CompileMacro("helper.cpp", "kO")
 
 
 N_FILES_MAX_PER_SAMPLE = args.nfiles or 1
-FILE = f'rdf{N_FILES_MAX_PER_SAMPLE}.root'
+FILE = f'rdf-{N_FILES_MAX_PER_SAMPLE}.root'
 START = args.startwith or 0
 
 print(f'you are processing {N_FILES_MAX_PER_SAMPLE} files starting from {START}')
@@ -66,10 +65,12 @@ class TtbarAnalysis(dict):
         self.first=first
         self.n_files_max_per_sample = n_files_max_per_sample  #the number of files to be processed per sample
         self.total = 0
+        self.nofevents = 0
         self.nfiles = self._construct_fileset() # dictionary assigning file URLs (paths) to each process, variation, and region
         self.num_bins = num_bins
         self.bin_low = bin_low
         self.bin_high = bin_high
+        
         
         
         # using https://atlas-groupdata.web.cern.ch/atlas-groupdata/dev/AnalysisTop/TopDataPreparation/XSection-MC15-13TeV.data
@@ -109,6 +110,8 @@ class TtbarAnalysis(dict):
                 fileset[process].update({variation: len(file_paths)})
                 self.total += len(file_paths)
                 self[process][variation] = {}
+                self.nofevents += nevts_total
+        print(f'Total number of events: {self.nofevents}')
                 
         return fileset
 
@@ -290,7 +293,7 @@ class TtbarAnalysis(dict):
                     
 
 
-disk='/data/ssdext4_agc_data/afalko' if not args.second_disk else '/data/ssdext4_agc_data_2/afalko'
+disk='/data/ssdext4_agc_data/afalko' 
 print(f'processing data located at {disk} disk')
 analysisManager = TtbarAnalysis(disk=disk)
 
@@ -307,22 +310,22 @@ print(f"processing took {round(t2 - t1,2)} seconds")
 print(f"execution took {round(t2 - t0,2)} seconds")
 
 
-analysisManager.TransfToDict()
-analysisManager['ttbar'].keys()
+#analysisManager.TransfToDict()
+#analysisManager['ttbar'].keys()
 
 
 
-# output = ROOT.TFile.Open(f'histograms/{FILE}', 'RECREATE')
-# for process in analysisManager:
-#     for variation in analysisManager[process]:
-#         for region in analysisManager[process][variation]:
-#             hist_name = f"{region}_{process}_{variation}" if variation != 'nominal' else f"{region}_{process}"
-#             hist = analysisManager[process][variation][region]
-#             if not isinstance(hist, ROOT.TH1D): hist = hist.GetValue() #this this a bag
-#             if hist.IsZombie(): raise TypeError(hist_name)
-#             hist_sliced = ROOT.Slice(hist, 120, 550)
-#             hist_binned = hist_sliced.Rebin(2, hist.GetTitle())
-#             output.WriteObject(hist_binned, hist_name)
-# output.Close()
+#output = ROOT.TFile.Open(f'histograms/{FILE}', 'RECREATE')
+#for process in analysisManager:
+#    for variation in analysisManager[process]:
+#        for region in analysisManager[process][variation]:
+ #           hist_name = f"{region}_{process}_{variation}" if variation != 'nominal' else f"{region}_{process}"
+  #          hist = analysisManager[process][variation][region]
+   #         if not isinstance(hist, ROOT.TH1D): hist = hist.GetValue() #this this a bag
+    #        if hist.IsZombie(): raise TypeError(hist_name)
+     #       hist_sliced = ROOT.Slice(hist, 120, 550)
+      #      hist_binned = hist_sliced.Rebin(2, hist.GetTitle())
+       #     output.WriteObject(hist_binned, hist_name)
+#output.Close()
 
 
