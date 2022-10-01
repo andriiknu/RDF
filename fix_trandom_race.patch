@@ -1,0 +1,69 @@
+diff --git a/helper.cpp b/helper.cpp
+index c291576..4f525ad 100644
+--- a/helper.cpp
++++ b/helper.cpp
+@@ -1,6 +1,6 @@
+ #include "TH1D.h"
+ #include <string>
+-#include "TRandom2.h"
++#include "TRandom3.h"
+ #include "ROOT/RVec.hxx"
+ 
+ // functions slicing histograms
+@@ -29,26 +29,26 @@ TH1D Slice(TH1D h, double low_edge, double high_edge)
+     return SliceHisto(h, xfirst, xlast);
+ }
+ 
+-
+ // functions creating systematic variations
+-ROOT::VecOps::RVec<float> pt_res_up(const ROOT::VecOps::RVec<float>& jet_pt)
+-{
++struct PtResUp {
++   std::vector<TRandom> fRandom;
++   PtResUp(unsigned nSlots) : fRandom(nSlots) {}
++
++   ROOT::VecOps::RVec<float> operator()(const ROOT::VecOps::RVec<float>& jet_pt, unsigned int slot)
++   {
+     // normal distribution with 5% variations, shape matches jets
+     ROOT::VecOps::RVec<float> res(jet_pt.size());
+-//     TRandom2 rnmd;
+     for (auto& e: res) {
+-//         rnmd.SetSeed(0); 
+-//         e = rnmd.Gaus(1,0.05);
+-        e = gRandom->Gaus(1,0.05);
++        e = fRandom[slot].Gaus(1,0.05);
+     }
+     return res;
+-}
++   }
++};
+ 
+ float pt_scale_up(){
+     return 1.03;
+ }
+ 
+-
+ ROOT::VecOps::RVec<float> btag_weight_variation (const ROOT::VecOps::RVec<float>& jet_pt) {
+ // weight variation depending on i-th jet pT (7.5% as default value, multiplied by i-th jet pT / 50 GeV)
+    ROOT::VecOps::RVec<float> res;
+diff --git a/rdf_ttbar.py b/rdf_ttbar.py
+index 317553b..1be8a49 100644
+--- a/rdf_ttbar.py
++++ b/rdf_ttbar.py
+@@ -84,6 +84,7 @@ class TtbarAnalysis(dict):
+             "data": None
+         }
+         print(f'Total number of files: {self.total}')
++        ROOT.gInterpreter.Declare(f"auto pt_res_up_obj = PtResUp({ROOT.GetThreadPoolSize()});")
+         
+ 
+     def _construct_fileset(self):
+@@ -137,7 +138,7 @@ class TtbarAnalysis(dict):
+             # pt_res_up(jet_pt) - jet resolution systematic 
+ 
+             
+-            d = d.Vary('jet_pt', "ROOT::RVec<ROOT::RVecF>{jet_pt*pt_scale_up(), jet_pt*pt_res_up(jet_pt)}", ["pt_scale_up", "pt_res_up"])
++            d = d.Vary('jet_pt', "ROOT::RVec<ROOT::RVecF>{jet_pt*pt_scale_up(), jet_pt*pt_res_up_obj(jet_pt, rdfslot_)}", ["pt_scale_up", "pt_res_up"])
+             if process == 'wjets':
+                 
+                 # flat weight variation definition
